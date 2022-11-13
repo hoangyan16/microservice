@@ -1,0 +1,8 @@
+{
+    "endPoint": "localhost",
+    "port": 9000,
+    "useSSL": false,
+    "accessKey": "minio-admin",
+    "secretKey": "admin123@",
+    "bucketName": "order-app"
+}
