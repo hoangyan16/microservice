@@ -28,14 +28,14 @@ exports.create = async (user) => {
 };
 
 exports.update = (id, request) => {
-    return models.user.update(request, {
+    return db.Users.update(request, {
         where: {
             id: id
         }
     });
 };
 exports.delete = (id) => {
-    return models.user.destroy({
+    return db.Users.destroy({
         where: {
             id: id
         }
@@ -78,7 +78,7 @@ exports.changePassword = async (request) => {
     }
 };
 exports.getUserByEmail = (email) => {
-    return models.user.findOne({
+    return db.Users.findOne({
         where: {
             email: email
         }
@@ -86,13 +86,13 @@ exports.getUserByEmail = (email) => {
 };
 // Forget-Password
 exports.forgotPassword = async (request) => {
-    const user = await models.user.findOne({
+    const user = await db.Users.findOne({
         where: {
             reset_code: request.token
         }
     });
     if (user) {
-        const date = await models.user.findOne({
+        const date = await db.Users.findOne({
             where: {
                 reset_code_valid: {
                     [Op.gte]: new Date()
@@ -106,7 +106,7 @@ exports.forgotPassword = async (request) => {
             const options = {
                 password: request.password
             };
-            return models.user.update(options, {
+            return db.Users.update(options, {
                 where: {
                     id: user.id
                 }

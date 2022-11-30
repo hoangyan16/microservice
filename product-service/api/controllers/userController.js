@@ -38,6 +38,8 @@ exports.register = async (req, res) => {
             event: EVENTSTATUS.CREATE.value,
             data: user
         }
+        console.log(payload);
+        
         await userService.create(user);
         channel.sendToQueue("IDENTITY",Buffer.from(JSON.stringify(payload)));
         await channel.close();

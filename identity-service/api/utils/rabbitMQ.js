@@ -15,13 +15,3 @@ module.exports.CreateChannel = async () => {
       throw err;
     }
   };
-
-
-// async function connectRabbitMQ(){
-//     const serverAmqp= 'amqp://localhost:5672';
-//     connection = await amqplib.connect(serverAmqp, opt);
-//     channel = await connection.createChannel();
-//     console.log(channel);
-//     await channel.assertQueue("IDENTITY");
-// };
-// connectRabbitMQ();

@@ -4,18 +4,48 @@ const ProductResponse = require("../../dtos/createOrUpdateProductResponseDto");
 const {validateProduct} = require("../../dtos/productCreateOrUpdateDto");
 const { CreateStatus } = require('../constants/Enum');
 const {unique} = require('../utils/removeDuplicateItem');
+const Product = require('../../dtos/productPaginatingResponse');
 
-
-exports.getByConditions = (query) => {
+exports.getByConditions =async (query) => {
+    console.log(query);
+    
     let condition = {
         deleted: false
     };
     if (query.categoryId) {
         condition.categoryId = query.categoryId;
     }
-    return db.Products.findAll({
-        where: condition
+    console.log(condition);
+    const pageIndex = parseInt(query.pageNumber) !=1 ? parseInt(query.pageNumber) : 1;  
+    console.log(pageIndex);
+    const pageSize  = parseInt(query.pageSize) != 4 ? parseInt(query.pageSize) : 4;
+    const offset = pageSize*(pageIndex-1);
+    let order = [['title', 'asc']]
+    if(query){
+        if(query.name=="title" ){
+            if(query.order=="desc"){
+                order = [['title', 'desc']]
+            }else{
+                order = [['title', 'asc']]
+            }
+        }else{
+            if(query.order=="desc"){
+                order = [['price', 'desc']]
+            }else{
+                order = [['price', 'asc']]
+            }
+        }
+    }
+    const data= await db.Products.findAll({
+        where: condition,
+        offset: offset,
+        limit: pageSize,
+        order: order,
     });
+    const dataTotal= await db.Products.findAll({
+        where: {deleted:false},
+    });
+    return new Product(dataTotal.length,pageIndex,pageSize,data);
 };
 
 exports.getById = async (id) => {

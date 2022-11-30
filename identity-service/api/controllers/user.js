@@ -14,14 +14,19 @@ CreateChannel().then((channel)=>{
         switch(event){
             case 1: 
             userService.create(data);
+            break;
             case 2:
-            userService.update(data.id, data)
+            userService.update(data.id, data);
+            break;
             case 3:
             userService.changePassword(data);
+            break;
         }
         channel.ack(message);
     })
-});
+}
+
+);
 
 async function update(req, res) {
     try {

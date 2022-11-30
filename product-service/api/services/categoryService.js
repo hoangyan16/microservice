@@ -3,12 +3,12 @@ const { ErrorCodes } = require("../constants/HTTPResponse");
 const { CreateStatus } = require('../constants/Enum');
 const Category = require('../../dtos/createOrUpdateCategoryResponseDto');
 
-exports.getByConditions = () => {
+exports.getByConditions = (query) => {
     let condition = {
         deleted: false
-    }
-    return db.Categories.findAll({
-        where: condition
+    };
+    return db.Categories.findAndCountAll({
+        where: condition,
     });
 };
 

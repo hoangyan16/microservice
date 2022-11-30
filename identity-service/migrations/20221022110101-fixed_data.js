@@ -32,7 +32,7 @@ module.exports = {
         type: Sequelize.STRING(2048)
       },
       expiresAt: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.DATE
       },
       createdAt: {
