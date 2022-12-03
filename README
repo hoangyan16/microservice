@@ -1,6 +1,6 @@
 cài mysql docker 
 docker run ^
--e MYSQL_ROOT_PASSWORD=password ^
+-e MYSQL_ROOT_PASSWORD=Abc@123456789 ^
 -- name mysql8
 -p 3308:3306 ^
 -v mysql8-volume:/var/lib/mysql ^

@@ -5,6 +5,7 @@ const { validate } = require('../middlewares/validators');
 const {checkAccessToken}= require('../middlewares/jwt_token');
 const {User} = require('../../dtos/userRegisterOrLoginRequestDto');
 
+
 router.put("/:id",checkAccessToken, userController.update);
 router.post('/register',userController.register);
 router.post('/change-password',checkAccessToken,userController.changePassword);
