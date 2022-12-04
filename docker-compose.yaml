@@ -1,0 +1,48 @@
+version: "3"
+services:
+  mysql:
+    image: mysql
+    ports:
+      - "3308:3306"
+    container_name: mysq;
+    volumes:
+      - ./mysql-volume8/:/var/lib/mysql
+  products:
+    build:
+      dockerfile: Dockerfile
+      context: ./product-service
+    container_name: products
+    ports:
+      - "8002:8002"
+    restart: always
+    depends_on:
+      - "mysql"
+    volumes:
+      - /product-service/node_modules
+
+    env_file:
+      - ./product-service/.env
+  customer:
+    build:
+      dockerfile: Dockerfile
+      context: ./identity-service
+    container_name: identity
+    ports:
+      - "8001:8001"
+    restart: always
+    depends_on:
+      - "mysql"
+
+    volumes:
+      - /identity-service/node_modules
+    env_file:
+      - ./identity-service/.env
+  nginx-proxy:
+    build:
+      dockerfile: Dockerfile
+      context: ./proxy
+    depends_on:
+      - product-service
+      - identity-service
+    ports:
+      - 80:80
