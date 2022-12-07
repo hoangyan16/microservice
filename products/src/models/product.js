@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     image03: DataTypes.STRING(2048),
     categoryId: DataTypes.INTEGER(4),
     categoryName : DataTypes.STRING(1024),
-    desc: DataTypes.STRING(2048),
+    desc: DataTypes.TEXT,
     deleted:DataTypes.BOOLEAN
   }, {
     sequelize,

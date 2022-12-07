@@ -1,7 +1,8 @@
 'use trict'
 const cartService = require('../services/cartService');
 const { ErrorCodes } = require("../constants/HTTPResponse");
-const { responseWithError } = require("../../utils/messageResponse");
+const { responseWithError ,responseSuccess} = require("../../utils/messageResponse");
+const { ORDER_STATUS } = require('../constants/Enum');
 
 exports.getByConditions = async (req, res) => {
     try {
@@ -9,6 +10,25 @@ exports.getByConditions = async (req, res) => {
         const {query} = req;
         const data = await cartService.getByConditions(username,query);
         res.json(data);
+    } catch (error) {
+        res.json(responseWithError(error.error, error.message));
+    }
+};
+
+exports.checkOut = async (req, res) => {
+    try {
+        /* 
+        "fullName": "",
+        "email":"",
+        "phoneNumber":"",
+        "address":"",
+        "orderId": ""
+        */
+        const cartInfo = req.body; 
+        cartInfo.shipping = 30;
+        cartInfo.status = ORDER_STATUS.PURCHASED.value;
+        await cartService.checkOut(cartInfo);
+        res.json(responseSuccess());
     } catch (error) {
         res.json(responseWithError(error.error, error.message));
     }

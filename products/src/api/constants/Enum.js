@@ -7,7 +7,7 @@ const CreateStatus = new Enum ({
 
 const ORDER_STATUS= new Enum({
     "CREATED": 1,
-    "SHOP_COMFIRM": 2,
+    "PURCHASED": 2,
     "SHIPPING":3,
     "DELIVERIED": 4
 });
@@ -17,6 +17,7 @@ const EVENT_STATUS = new Enum({
     "UPDATE":2,
     "CHANGE_PASSWORD":3
 })
+
 module.exports ={
     CreateStatus, ORDER_STATUS,EVENT_STATUS
 }

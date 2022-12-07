@@ -8,5 +8,6 @@ router.get('/',checkAccessToken, cartController.getByConditions);
 router.get("/:id", cartController.getById);
 router.post('/',cartController.createOrUpdate);
 router.post('/delete',cartController.delete);
+router.post('/check-out',cartController.checkOut);
 
 module.exports = router;

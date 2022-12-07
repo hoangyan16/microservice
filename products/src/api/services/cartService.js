@@ -9,15 +9,15 @@ exports.getByConditions = async (username, query) => {
             return Promise.reject({ error: ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST, message: 'Người dùng không tồn tại ! ' });
         }
         const userId = userDB.id;
-        let cart = await db.Carts.findOne({ where: { userId: userId } });
+        let cart = await db.Carts.findOne({ where: { userId: userId, status: ORDER_STATUS.CREATED.value } });
         if (cart == null) {
             cart = {
                 userId: userId,
                 product: "",
                 status: ORDER_STATUS.CREATED.value,
-                totalPrice: 0
+                subPrice: 0
             };
-            const orders = await db.Orders.findAll({ where: { userId: userId },attributes:["id","productName","productId","price","status"]});
+            const orders = await db.Orders.findAll({ where: { userId: userId, status: ORDER_STATUS.CREATED.value },attributes:["id","productName","productId","price","status"]});
             if (orders.length == 0) {
                 return Promise.reject({ error: ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST, message: 'Giỏ hàng trống , hãy mua hàng !' });
             }
@@ -26,18 +26,18 @@ exports.getByConditions = async (username, query) => {
             }
             cart.product =JSON.stringify(orders);
             await db.Carts.create(cart);
-            cart = await db.Carts.findOne({ where: { userId: userId } });
+            cart = await db.Carts.findOne({ where: { userId: userId } ,attributes:["id","userId","product","subPrice","status"]});
             cart.product= JSON.parse(cart.product);
             return cart;
         } else {
-            const orders = await db.Orders.findAll({ where: { userId: userId }, attributes:["id","productName","productId","price","status"]});
-            cart.totalPrice = 0;
+            const orders = await db.Orders.findAll({ where: { userId: userId, status: ORDER_STATUS.CREATED.value }, attributes:["id","productName","productId","price","status"]});
+            cart.subPrice = 0;
             for (var order of orders) {    
-                cart.totalPrice += parseInt(order.price);
+                cart.subPrice += parseInt(order.price);
             }
             const updateCart = {
                 product : JSON.stringify(orders),
-                totalPrice: cart.totalPrice
+                subPrice: cart.subPrice
             }
             await db.Carts.update(updateCart,{
                 where:
@@ -45,7 +45,7 @@ exports.getByConditions = async (username, query) => {
                     userId: userId
                 }
             });
-            cart = await db.Carts.findOne({ where: { userId: userId } });
+            cart = await db.Carts.findOne({ where: { userId: userId, status: ORDER_STATUS.CREATED.value },attributes:["id","userId","product","subPrice","status"] });
             cart.product= JSON.parse(cart.product);
             return cart;
         }
@@ -54,8 +54,24 @@ exports.getByConditions = async (username, query) => {
     }
 };
 
+exports.checkOut = async (cartInfo) => {
+    const cart = await db.Carts.findOne(
+        {
+            where: {
+                id: cartInfo.orderId,
+                status:ORDER_STATUS.CREATED.value
+            }
+        }
+    );
+    if (cart == null) {
+        return Promise.reject({ error: ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST, message: "Đơn hàng này không tồn tại !" })
+    }
+    cartInfo.totalPrice = parseInt(cartInfo.shipping) +  parseInt(cart.subPrice);
+    return db.Carts.update(cartInfo, {where:{id: cart.id} });
+};
+
 exports.getById = async (id) => {
-    const cart = await db.Carts.findAll(
+    const cart = await db.Carts.findOne(
         {
             where: {
                 id: id
@@ -63,7 +79,7 @@ exports.getById = async (id) => {
         }
     );
     if (cart == null) {
-        return Promise.reject({ error: ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST, message: "Sản phẩm này không tồn tại !" })
+        return Promise.reject({ error: ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST, message: "Đơn hàng này không tồn tại !" })
     }
     return cart;
 };

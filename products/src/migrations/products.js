@@ -27,7 +27,7 @@ module.exports = {
         type: Sequelize.STRING(2048)
       },
       desc: {
-        type: Sequelize.STRING(2048)
+        type: Sequelize.TEXT
       },
       categoryId: {
         allowNull: false,
