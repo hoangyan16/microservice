@@ -19,7 +19,7 @@ exports.getByConditions = async (username, query) => {
             };
             const orders = await db.Orders.findAll({ where: { userId: userId, status: ORDER_STATUS.CREATED.value },attributes:["id","productName","productId","price","status"]});
             if (orders.length == 0) {
-                return Promise.reject({ error: ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST, message: 'Giỏ hàng trống , hãy mua hàng !' });
+                return Promise.reject({ error: ErrorCodes.ERROR_CODE_SUCCESS, message: 'Giỏ hàng trống , hãy mua hàng !' });
             }
             for (var order of orders) {
                 cart.totalPrice += parseInt(order.price);
@@ -66,8 +66,13 @@ exports.checkOut = async (cartInfo) => {
     if (cart == null) {
         return Promise.reject({ error: ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST, message: "Đơn hàng này không tồn tại !" })
     }
+    var products = JSON.parse(cart.product);
+    products = products.filter(x=> x.status = ORDER_STATUS.PURCHASED.value);
+    console.log(products);
     cartInfo.totalPrice = parseInt(cartInfo.shipping) +  parseInt(cart.subPrice);
+    db.Orders.bulkCreate(products, { updateOnDuplicate: ["status"]});
     return db.Carts.update(cartInfo, {where:{id: cart.id} });
+
 };
 
 exports.getById = async (id) => {

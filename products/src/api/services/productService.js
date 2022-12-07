@@ -1,11 +1,11 @@
 const db = require("../../models/index");
+const sequelize = require('sequelize');
 const { ErrorCodes } = require("../constants/HTTPResponse");
 const ProductResponse = require("../../dtos/createOrUpdateProductResponseDto");
 const { validateProduct } = require("../../dtos/productCreateOrUpdateDto");
 const { CreateStatus } = require('../constants/Enum');
 const { unique } = require('../../utils/removeDuplicateItem');
 const Product = require('../../dtos/productPaginatingResponse');
-
 exports.getByConditions = async (query) => {
     let condition = {
         deleted: false
@@ -13,9 +13,11 @@ exports.getByConditions = async (query) => {
     if (query.categoryId) {
         condition.categoryId = query.categoryId;
     }
-    const pageIndex = query.pageNumber ? parseInt(query.pageNumber) != 1 ? parseInt(query.pageNumber) : 1 : 1;
-    const pageSize = query.pageNumber ? parseInt(query.pageSize) != 4 ? parseInt(query.pageSize) : 4 : 4;
-    const offset = pageSize * (pageIndex - 1);
+    if (query.search)
+    condition.title = sequelize.where(sequelize.fn('LOWER', sequelize.col('Products.title')), 'LIKE', '%' + query.search.toLowerCase() + '%')
+    var pageIndex = query.pageNumber ? parseInt(query.pageNumber) != 1 ? parseInt(query.pageNumber) : 1 : 1;
+    var pageSize = query.pageNumber ? parseInt(query.pageSize) != 4 ? parseInt(query.pageSize) : 4 : 4;
+    let offset = pageSize * (pageIndex - 1);
     let order = [['title', 'asc']]
     if (query) {
         if (query.name == "title") {
@@ -39,8 +41,9 @@ exports.getByConditions = async (query) => {
         order: order,
     });
     const dataTotal = await db.Products.findAll({
-        where: { deleted: false },
+        where: condition
     });
+    if(pageSize > dataTotal.length ) pageSize = dataTotal.length;
     return new Product(dataTotal.length, pageIndex, pageSize, data);
 };
 
