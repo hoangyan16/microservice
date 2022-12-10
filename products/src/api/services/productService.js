@@ -84,7 +84,7 @@ exports.createOrUpdate = async (lstProduct) => {
             }
             product.categoryName = Category[0].display;
             if (product.id) {
-                const checkProductExist = await db.Product.findOne({ where: { id: product.id } });
+                const checkProductExist = await db.Products.findOne({ where: { id: product.id } });
                 if (checkProductExist == null) {
                     result = new ProductResponse(product.title, "Sản phẩm không tồn tại !", CreateStatus.FAIL.value);
                     response.push(result);
@@ -102,10 +102,10 @@ exports.createOrUpdate = async (lstProduct) => {
             }
         }
         if (lstCreate.length > 0) {
-            db.Products.bulkCreate(lstCreate);
+            await db.Products.bulkCreate(lstCreate);
         }
         if (lstUpdate.length > 0) {
-            db.Products.bulkCreate(lstUpdate, { updateOnDuplicate: ["title", "image01", "image03", "image03", "price", "desc", "categoryId", "categoryName"] });
+            await db.Products.bulkCreate(lstUpdate, { updateOnDuplicate: ["title", "image01", "image03", "image03", "price", "desc", "categoryId", "categoryName"] });
         }
         return response;
     } catch (error) {

@@ -7,7 +7,7 @@ const { SubscribeMessage } = require('../../utils/rabbitMQ');
 const { validate } = require('../middlewares/validators');
 const { User } = require('../../dtos/userRegisterOrLoginRequest');
 const { checkAccessToken } = require('../middlewares/jwt_token');
-
+const mailService = require('../services/mail');
 module.exports =async (app, channel)=>{
     const service = new userService();
 
@@ -73,13 +73,14 @@ module.exports =async (app, channel)=>{
                 var timeExpire = new Date();
                 timeExpire.setMinutes(time.getMinutes() + 3);
                 const options = {
-                    reset_code: token,
-                    reset_code_valid: timeExpire
+                    token: token,
+                    expiresAt: timeExpire
                 };
+                
                 service.update(user.id, options).then(async (data) => {
                     if (data == 1) {
                         const host = req.headers.host;
-                        const checkMailSend = await mailService.sendMailVerify(host, email, token, user.user_name);
+                        const checkMailSend = await mailService.sendMailVerify(host, email, token);
                         if (checkMailSend.accepted.length > 0) {
                             res.json(responseSuccess());
                         } else {

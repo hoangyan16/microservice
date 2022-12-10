@@ -66,6 +66,11 @@ exports.createOrUpdate = async (lstOrder, username) => {
                     response.push(result);
                     continue;
                 }
+                if(checkProductExist.status != ORDER_STATUS.CREATED.value){
+                    result = new OrderResponse(order.id, `Không thể cập nhật đơn hàng này`, CreateStatus.FAIL.value);
+                    response.push(result);
+                    continue;
+                }
                 lstUpdate.push(order);
                 result = new OrderResponse(order.id, `Cập nhật đơn hàng thành công !`, CreateStatus.SUCCESS.value);
                 response.push(result);

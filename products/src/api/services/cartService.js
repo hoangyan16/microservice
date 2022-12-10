@@ -68,11 +68,9 @@ exports.checkOut = async (cartInfo) => {
     }
     var products = JSON.parse(cart.product);
     products = products.filter(x=> x.status = ORDER_STATUS.PURCHASED.value);
-    console.log(products);
     cartInfo.totalPrice = parseInt(cartInfo.shipping) +  parseInt(cart.subPrice);
     db.Orders.bulkCreate(products, { updateOnDuplicate: ["status"]});
     return db.Carts.update(cartInfo, {where:{id: cart.id} });
-
 };
 
 exports.getById = async (id) => {
@@ -95,13 +93,16 @@ exports.createOrUpdate = async (cart) => {
         if (cart.id) {
             const checkcartExist = await db.Carts.findOne({ where: { id: cart.id } });
             if (checkcartExist == null) {
-                return Promise.reject({ error: ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST, message: "Sản phẩm không tồn tại !", status: CreateStatus.FAIL.value });
+                return Promise.reject({ error: ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST, message: "Giỏ hàng trống ", status: CreateStatus.FAIL.value });
+            }
+            if (checkcartExist != ORDER_STATUS.CREATED.value) {
+                return Promise.reject({ error: ErrorCodes.ERROR_CODE_ITEM_NOT_EXIST, message: "Không thể cập nhật đơn hàng này", status: CreateStatus.FAIL.value });
             }
             await db.Carts.update(cart, { where: { id: cart.id } });
-            response = new cart(cart.title, "Sửa sản phẩm thành công", CreateStatus.SUCCESS.value);
+            response = new cart(cart.title, "Sửa đơn hàng thành công", CreateStatus.SUCCESS.value);
         } else {
             await db.Carts.create(cart);
-            response = new cart(cart.title, "Thêm sản phẩm thành công", CreateStatus.SUCCESS.value);
+            response = new cart(cart.title, "Thêm đơn hàng thành công", CreateStatus.SUCCESS.value);
         }
         return response;
     } catch (error) {

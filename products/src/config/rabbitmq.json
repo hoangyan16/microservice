@@ -1,5 +1,5 @@
 {
-    "URL":"amqp://localhost:5672",
+    "URL":"amqp://rabbitmq:5672",
     "USERNAME":"hoanganlxt1",
     "PASSWORD":"Edu@123",
     "EXCHANGE_NAME" :"Order-App"

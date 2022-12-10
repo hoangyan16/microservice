@@ -176,6 +176,13 @@ class UserService {
                 } catch (err) {
                     return err
                 }
+            case 4:
+                try {
+                    this.forgotPassword(user);
+                    return ("Cập nhật mật khẩu thành công !");
+                } catch (err) {
+                    return err
+                }
             default:
                 break;
         }

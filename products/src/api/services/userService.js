@@ -74,7 +74,7 @@ class UserService {
         }
     };
     getUserByEmail(email)  {
-        return models.user.findOne({
+        return db.Users.findOne({
             where: {
                 email: email
             }
