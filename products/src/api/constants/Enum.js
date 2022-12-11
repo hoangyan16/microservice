@@ -15,7 +15,8 @@ const ORDER_STATUS= new Enum({
 const EVENT_STATUS = new Enum({
     "CREATE":1,
     "UPDATE":2,
-    "CHANGE_PASSWORD":3
+    "CHANGE_PASSWORD":3,
+    "DELETE":4
 })
 
 module.exports ={

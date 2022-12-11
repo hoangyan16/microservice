@@ -48,8 +48,8 @@ exports.getById = async (req, res) => {
 
 exports.createOrUpdate = async (req, res) => {
     try {
-        const category = req.data;
-        const response = await cartService.createOrUpdate(category);
+        const cart = req.data;
+        const response = await cartService.createOrUpdate(cart);
         res.json((response));
     } catch (error) {
         res.json(responseWithError(error.error, error.message));

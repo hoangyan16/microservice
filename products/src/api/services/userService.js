@@ -30,12 +30,16 @@ class UserService {
             }
         });
     };
-    delete(id) {
-        return models.user.destroy({
-            where: {
-                id: id
-            }
-        });
+    delete(id,option) {
+        try{
+            return models.user.update(option,{
+                where: {
+                    id: id
+                }
+            });
+        }catch(err){
+            return Promise.reject({ error: ErrorCodes.ERROR_CODE_SYSTEM_ERROR, message: 'error' });
+        }
     };
     async changePassword (request) {
         try {

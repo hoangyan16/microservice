@@ -40,13 +40,13 @@ module.exports = (app, channel) => {
     });
 
 
-    app.post('/user/change-password',async (req, res) => {
+    app.post('/user/change-password',checkAccessToken,async (req, res) => {
         try {
             const userRequest = req.body;
             userRequest.userId = req.user.id;
             await service.changePassword(userRequest);
             const payload = service.GetUserPayload(userRequest,EVENT_STATUS.CHANGE_PASSWORD);
-            PublishMessage(process.env.ROUTING_KEY,userRequest);
+            PublishMessage(channel, JSON.stringify(payload));
             res.json(responseSuccess());
         } catch (error) {
             res.json(responseWithError(error.error, error.message));
@@ -95,24 +95,34 @@ module.exports = (app, channel) => {
             });
         });
     });
-    // Forget_password
-    app.post('/user/forgot-password',async (req, res, next) => {
-        const request = {
-            token: req.body.token,
-            password: req.body.password
-        }
-        service.forgotPassword(request).then((result) => {
-            if (result.message) {
-                res.json(responseWithError(ErrorCodes.ERROR_CODE_API_BAD_REQUEST, 'error', result.message));
-            } else {
-                res.json(responseSuccess());
+    // // Forget_password
+    // app.post('/user/forgot-password',async (req, res, next) => {
+    //     const request = {
+    //         token: req.body.token,
+    //         password: req.body.password
+    //     }
+    //    await service.forgotPassword(request);
+    //    PublishMessage(channel,JSON.stringify(payload));
+    //     }).catch((err) => {
+    //         res.send({
+    //             error: 1,
+    //             status: err.status || 500,
+    //             message: err.message
+    //         });
+    //     });
+    // });
+        // Forget_password
+        app.post('/user/delete',checkAccessToken,async (req, res, next) => {
+            try{
+            const options = {
+                deleted: true
             }
-        }).catch((err) => {
-            res.send({
-                error: 1,
-                status: err.status || 500,
-                message: err.message
-            });
+            const payload = await service.GetUserPayload(user,EVENT_STATUS.DELETE.value);
+            await service.delete(req.body.id,options);
+            PublishMessage(channel,JSON.stringify(payload));
+            res.json(responseSuccess());
+        } catch (error) {
+            res.json(responseWithError(error.error, error.message));
+        }
         });
-    });
 }

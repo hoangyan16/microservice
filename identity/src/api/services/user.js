@@ -32,8 +32,8 @@ class UserService {
             }
         });
     };
-    delete(id) {
-        return db.Users.destroy({
+    delete(id,options) {
+        return db.Users.update(options,{
             where: {
                 id: id
             }
@@ -152,7 +152,7 @@ class UserService {
         console.log(payload);
 
         const { event, data } = payload;
-        const { id, user } = data;
+        const { id, user,options } = data;
 
         switch (event) {
             case 1:
@@ -178,8 +178,8 @@ class UserService {
                 }
             case 4:
                 try {
-                    this.forgotPassword(user);
-                    return ("Cập nhật mật khẩu thành công !");
+                    this.delete(id,options);
+                    return ("Xóa tài khoản thành công !");
                 } catch (err) {
                     return err
                 }
